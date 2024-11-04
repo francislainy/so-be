@@ -39,7 +39,7 @@ public class AuthServiceTest {
                 .password("password")
                 .build();
 
-       when(userRepository.registerUser(any(UserEntity.class))).thenReturn(userEntity);
+       when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
        User registeredUser = authService.registerUser(user);
 
@@ -51,6 +51,6 @@ public class AuthServiceTest {
                 () -> assertNotNull(registeredUser.getPassword(), "User password should not be null")
        );
 
-       verify(userRepository).registerUser(any(UserEntity.class));
+       verify(userRepository).save(any(UserEntity.class));
     }
 }

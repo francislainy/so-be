@@ -2,6 +2,7 @@ package com.francislainy.sobe.entity;
 
 import com.francislainy.sobe.model.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -18,7 +19,7 @@ import java.util.UUID;
 public class UserEntity {
 
     @Id
-    @Generated
+    @GeneratedValue
     private UUID id;
     private String username;
     private String password;

@@ -15,7 +15,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User registerUser(User user) {
-        UserEntity userEntity = userRepository.registerUser(user.toEntity());
+        UserEntity userEntity = userRepository.save(user.toEntity());
         return userEntity.toModel();
     }
 }
