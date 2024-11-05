@@ -8,9 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import static com.francislainy.sobe.util.TestUtil.toJson;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,13 +21,6 @@ public class AuthControllerIT extends BasePostgresConfig {
 
     @Autowired
     private MockMvc mockMvc;
-
-
-    static {
-        postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres").withTag("latest"));
-        postgres.start();
-    }
-
 
     @Test
     public void testRegisterUser() throws Exception {
