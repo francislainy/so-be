@@ -1,5 +1,6 @@
 package com.francislainy.sobe.controller;
 
+import com.francislainy.sobe.config.BasePostgresConfig;
 import com.francislainy.sobe.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,17 +8,28 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import static com.francislainy.sobe.util.TestUtil.toJson;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class AuthControllerIT {
+public class AuthControllerIT extends BasePostgresConfig {
 
     @Autowired
     private MockMvc mockMvc;
+
+
+    static {
+        postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres").withTag("latest"));
+        postgres.start();
+    }
+
 
     @Test
     public void testRegisterUser() throws Exception {
