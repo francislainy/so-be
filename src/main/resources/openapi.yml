@@ -1,0 +1,30 @@
+openapi: 3.0.1
+info:
+  title: SO (Stack Overflow clone) API
+  description: This is a clone of Stack Overflow, providing a platform for users to ask and answer technical questions.
+  version: 1.0.0
+paths:
+  /api/v1/auth/register:
+    post:
+      summary: Register a new user
+      description: This endpoint allows you to register a new user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Bad request
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
