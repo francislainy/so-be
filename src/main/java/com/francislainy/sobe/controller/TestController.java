@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @GetMapping("/test-user")
-    public ResponseEntity<Object> registerUser() {
-        return ResponseEntity.created(null).build();
+    public ResponseEntity<Object> userRoleTest() {
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/test-admin")
-    public ResponseEntity<Object> loginUser() {
+    public ResponseEntity<Object> adminRoleTest() {
         return ResponseEntity.created(null).build();
     }
 }
