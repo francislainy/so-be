@@ -9,6 +9,8 @@ import lombok.With;
 
 import java.util.UUID;
 
+import static com.francislainy.sobe.enums.UserRole.USER;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,6 +21,7 @@ public class User {
     private UUID id;
     private String username;
     private String password;
+    private String role = USER.toString();
 
     // map to entity
     public UserEntity toEntity() {
@@ -26,6 +29,7 @@ public class User {
                 .id(id)
                 .username(username)
                 .password(password)
+                .role(role)
                 .build();
     }
 }
