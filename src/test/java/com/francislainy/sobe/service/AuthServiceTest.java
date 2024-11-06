@@ -10,10 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,21 +32,16 @@ public class AuthServiceTest {
 
     @Test
     void shouldRegisterUser() {
-        UserEntity userEntity = UserEntity.builder()
-                .id(randomUUID())
-                .username("email.com")
+        User user = User.builder()
+                .username("username")
                 .password("password")
                 .build();
 
-        User user = User.builder()
-                .username("email.com")
-                .password("password")
-                .build();
+        UserEntity userEntity = user.withId(randomUUID()).toEntity();
 
        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
        User registeredUser = authService.registerUser(user);
-
        assertNotNull(registeredUser, "User should not be null");
 
        assertAll(
@@ -51,6 +50,41 @@ public class AuthServiceTest {
                 () -> assertNotNull(registeredUser.getPassword(), "User password should not be null")
        );
 
-       verify(userRepository).save(any(UserEntity.class));
+       verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
+    @Test
+    void shouldLoginUser() {
+        User userRequest = User.builder()
+                .username("email.com")
+                .password("password")
+                .build();
+
+        User userResponse = userRequest.withId(randomUUID());
+
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(userResponse.toEntity()));
+
+        User loggedInUser = authService.loginUser(userRequest);
+        assertNotNull(loggedInUser, "User should not be null");
+
+        assertAll(
+                () -> assertNotNull(userResponse.getId(), "User id should not be null"),
+                () -> assertNotNull(userResponse.getUsername(), "User username should not be null"),
+                () -> assertNotNull(userResponse.getPassword(), "User password should not be null")
+        );
+
+        verify(userRepository, times(1)).findByUsername(any(String.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotFoundOnLogin() {
+        User userRequest = User.builder()
+                .username("username")
+                .password("password")
+                .build();
+
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> authService.loginUser(userRequest));
     }
 }
