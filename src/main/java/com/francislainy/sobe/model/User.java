@@ -9,7 +9,7 @@ import lombok.With;
 
 import java.util.UUID;
 
-import static com.francislainy.sobe.enums.UserType.USER;
+import static com.francislainy.sobe.enums.UserRole.USER;
 
 @Data
 @Builder

@@ -7,8 +7,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.francislainy.sobe.enums.UserType.ADMIN;
-import static com.francislainy.sobe.enums.UserType.USER;
+import static com.francislainy.sobe.enums.UserRole.ADMIN;
+import static com.francislainy.sobe.enums.UserRole.USER;
 
 @Configuration
 public class WebAuthorizationConfig {
@@ -21,8 +21,8 @@ public class WebAuthorizationConfig {
 
         http.authorizeHttpRequests(
                 c -> c
-                        .requestMatchers(HttpMethod.POST, "/api/v1/test-admin").hasRole(String.valueOf(ADMIN))
-                        .requestMatchers(HttpMethod.GET, "/api/v1/test-user").hasRole(String.valueOf(USER))
+                        .requestMatchers(HttpMethod.POST, "/api/v1/test-admin").hasRole(String.valueOf(ADMIN)) //todo: remove this endpoint once new valid endpoints are added - 06/11/2024
+                        .requestMatchers(HttpMethod.GET, "/api/v1/test-user").hasRole(String.valueOf(USER)) //todo: remove this endpoint once new valid endpoints are added - 06/11/2024
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/*").permitAll()
                         .anyRequest().authenticated()
         );

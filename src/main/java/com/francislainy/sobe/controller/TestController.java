@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/")
 @RequiredArgsConstructor
+// todo: class to be removed once new valid endpoints are added - 06/11/2024
 public class TestController {
 
     @GetMapping("/test-user")

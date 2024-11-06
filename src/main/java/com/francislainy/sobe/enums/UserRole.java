@@ -1,6 +1,6 @@
 package com.francislainy.sobe.enums;
 
-public enum UserType {
+public enum UserRole {
     ADMIN,
     USER
 }
