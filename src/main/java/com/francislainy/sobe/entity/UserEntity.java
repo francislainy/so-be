@@ -5,8 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
-import org.hibernate.annotations.Generated;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
@@ -24,12 +26,15 @@ public class UserEntity {
     private String username;
     private String password;
 
+    private String role;
+
     // map to model
     public User toModel() {
         return User.builder()
                 .id(id)
                 .username(username)
                 .password(password)
+                .role(role)
                 .build();
     }
 }
