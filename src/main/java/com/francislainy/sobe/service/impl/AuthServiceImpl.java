@@ -18,4 +18,11 @@ public class AuthServiceImpl implements AuthService {
         UserEntity userEntity = userRepository.save(user.toEntity());
         return userEntity.toModel();
     }
+
+    @Override
+    public User loginUser(User user) {
+        return userRepository.findByUsername(user.getUsername())
+                .map(UserEntity::toModel)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
