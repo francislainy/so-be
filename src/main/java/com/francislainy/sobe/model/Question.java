@@ -22,6 +22,7 @@ public class Question {
     private String title;
     private String content;
     private LocalDateTime createdAt;
+
     private UUID userId;
 
     // map to entity
@@ -31,6 +32,7 @@ public class Question {
                 .title(title)
                 .content(content)
                 .userEntity(UserEntity.builder().id(userId).build())
+                .createdAt(createdAt)
                 .build();
     }
 }

@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,6 +27,7 @@ public class QuestionEntity {
     private UUID id;
     private String title;
     private String content;
+    private LocalDateTime createdAt;
 
     @ManyToOne
     private UserEntity userEntity;
@@ -37,6 +39,7 @@ public class QuestionEntity {
                 .title(title)
                 .content(content)
                 .userId(userEntity.getId())
+                .createdAt(createdAt)
                 .build();
     }
 

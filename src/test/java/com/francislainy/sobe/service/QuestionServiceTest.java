@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
@@ -37,6 +38,7 @@ public class QuestionServiceTest {
                 .title("question")
                 .content("content")
                 .userId(userId)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         UUID questionId = randomUUID();
@@ -52,6 +54,7 @@ public class QuestionServiceTest {
                 () -> assertEquals(questionId, createdQuestion.getId(), "Question id should match"),
                 () -> assertEquals(question.getTitle(), createdQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), createdQuestion.getContent(), "Question content should match"),
+                () -> assertEquals(question.getCreatedAt(), createdQuestion.getCreatedAt(), "Question created at should match"),
 
                 () -> assertEquals(userId, createdQuestion.getUserId(), "Question user id should match")
         );
