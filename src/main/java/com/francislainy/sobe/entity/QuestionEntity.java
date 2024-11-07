@@ -1,45 +1,43 @@
 package com.francislainy.sobe.entity;
 
-import com.francislainy.sobe.model.User;
+import com.francislainy.sobe.model.Question;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "questions")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity {
+public class QuestionEntity {
 
     @Id
     @GeneratedValue
     private UUID id;
-    private String username;
-    private String password;
+    private String title;
+    private String content;
 
-    private String role;
-
-    @OneToMany(mappedBy = "userEntity")
-    private List<QuestionEntity> questions;
+    @ManyToOne
+    private UserEntity userEntity;
 
     // map to model
-    public User toModel() {
-        return User.builder()
+    public Question toModel() {
+        return Question.builder()
                 .id(id)
-                .username(username)
-                .password(password)
-                .role(role)
+                .title(title)
+                .content(content)
+                .userId(userEntity.getId())
                 .build();
     }
+
 }

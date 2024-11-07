@@ -1,17 +1,20 @@
 package com.francislainy.sobe.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class TestUtil {
 
-    // helper
     public static String toJson(Object object) {
+        ObjectMapper om = new ObjectMapper();
+        om.registerModule(new JavaTimeModule());
+        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         try {
-            return new ObjectMapper().writeValueAsString(object);
-        } catch (JsonProcessingException e) {
+            return om.writeValueAsString(object);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
