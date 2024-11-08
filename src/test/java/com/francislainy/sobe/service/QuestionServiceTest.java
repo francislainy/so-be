@@ -55,7 +55,6 @@ public class QuestionServiceTest {
                 () -> assertEquals(question.getTitle(), createdQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), createdQuestion.getContent(), "Question content should match"),
                 () -> assertEquals(question.getCreatedAt(), createdQuestion.getCreatedAt(), "Question created at should match"),
-
                 () -> assertEquals(userId, createdQuestion.getUserId(), "Question user id should match")
         );
 

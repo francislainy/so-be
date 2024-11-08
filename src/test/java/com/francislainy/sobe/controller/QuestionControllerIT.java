@@ -12,9 +12,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static com.francislainy.sobe.util.TestUtil.fromJson;
 import static com.francislainy.sobe.util.TestUtil.toJson;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,9 +49,19 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 .userId(userEntity.getId())
                 .build();
 
-        mockMvc.perform(post("/api/v1/questions")
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/questions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(question)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        Question createdQuestion = (Question) fromJson(mvcResult.getResponse().getContentAsString(), Question.class);
+        assertNotNull(createdQuestion, "Question should not be null");
+        assertAll(
+                () -> assertNotNull(createdQuestion.getId(), "Question id should not be null"),
+                () -> assertEquals(question.getTitle(), createdQuestion.getTitle(), "Question title should match"),
+                () -> assertEquals(question.getContent(), createdQuestion.getContent(), "Question content should match"),
+                () -> assertEquals(question.getUserId(), createdQuestion.getUserId(), "Question user id should match")
+        );
     }
 }
