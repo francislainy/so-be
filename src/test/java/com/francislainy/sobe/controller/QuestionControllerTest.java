@@ -17,7 +17,6 @@ import static java.util.UUID.randomUUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,8 +39,6 @@ public class QuestionControllerTest {
                 .createdAt(LocalDateTime.now())
                 .userId(randomUUID())
                 .build();
-
-//        when(questionService.createQuestion(any(Question.class))).thenReturn(question);
 
         mockMvc.perform(post("/api/v1/questions")
                         .contentType(MediaType.APPLICATION_JSON)
