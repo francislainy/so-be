@@ -41,7 +41,7 @@ public class QuestionControllerTest {
                 .userId(randomUUID())
                 .build();
 
-        when(questionService.createQuestion(any(Question.class))).thenReturn(question);
+//        when(questionService.createQuestion(any(Question.class))).thenReturn(question);
 
         mockMvc.perform(post("/api/v1/questions")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -49,5 +49,69 @@ public class QuestionControllerTest {
                 .andExpect(status().isCreated());
 
         verify(questionService, times(1)).createQuestion(any(Question.class));
+    }
+
+    @Test
+    void shouldNotCreateQuestionWhenTitleIsNull() throws Exception {
+        Question question = Question.builder()
+                .id(randomUUID())
+                .title(null)
+                .content("I am trying to create a question but I am not sure how to do it.")
+                .createdAt(LocalDateTime.now())
+                .userId(randomUUID())
+                .build();
+
+        mockMvc.perform(post("/api/v1/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(question)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldNotCreateQuestionWhenTitleIsEmpty() throws Exception {
+        Question question = Question.builder()
+                .id(randomUUID())
+                .title("")
+                .content("I am trying to create a question but I am not sure how to do it.")
+                .createdAt(LocalDateTime.now())
+                .userId(randomUUID())
+                .build();
+
+        mockMvc.perform(post("/api/v1/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(question)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldNotCreateQuestionWhenContentIsNull() throws Exception {
+        Question question = Question.builder()
+                .id(randomUUID())
+                .title("How to create a question?")
+                .content(null)
+                .createdAt(LocalDateTime.now())
+                .userId(randomUUID())
+                .build();
+
+        mockMvc.perform(post("/api/v1/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(question)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldNotCreateQuestionWhenContentIsEmpty() throws Exception {
+        Question question = Question.builder()
+                .id(randomUUID())
+                .title("How to create a question?")
+                .content("")
+                .createdAt(LocalDateTime.now())
+                .userId(randomUUID())
+                .build();
+
+        mockMvc.perform(post("/api/v1/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(question)))
+                .andExpect(status().isBadRequest());
     }
 }
