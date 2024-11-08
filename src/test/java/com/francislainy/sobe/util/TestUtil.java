@@ -18,4 +18,15 @@ public class TestUtil {
             throw new RuntimeException(e);
         }
     }
+
+    public static Object fromJson(String json, Class<?> clazz) {
+        ObjectMapper om = new ObjectMapper();
+        om.registerModule(new JavaTimeModule());
+        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        try {
+            return om.readValue(json, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
