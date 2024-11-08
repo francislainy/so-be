@@ -1,20 +1,35 @@
 package com.francislainy.sobe;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.parser.OpenAPIV3Parser;
+import org.springdoc.core.configuration.SpringDocConfiguration;
+import org.springdoc.core.configuration.SpringDocUIConfiguration;
+import org.springdoc.core.properties.SpringDocConfigProperties;
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
+import org.springdoc.core.providers.ObjectMapperProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Optional;
+
 @Configuration
 public class OpenApiConfig {
-    
+
     @Bean
-    public OpenAPI customOpenAPI() {
-        OpenAPI openAPI = new OpenAPIV3Parser()
-            .read("src/main/resources/openapi.yml");
-        if (openAPI == null) {
-            throw new IllegalStateException("Failed to parse OpenAPI file.");
-        }
-        return openAPI;
+    SpringDocConfiguration springDocConfiguration(){
+        return new SpringDocConfiguration();
+    }
+
+    @Bean
+    SpringDocConfigProperties springDocConfigProperties() {
+        return new SpringDocConfigProperties();
+    }
+
+    @Bean
+    ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties){
+        return new ObjectMapperProvider(springDocConfigProperties);
+    }
+
+    @Bean
+    SpringDocUIConfiguration SpringDocUIConfiguration(Optional<SwaggerUiConfigProperties> optionalSwaggerUiConfigProperties){
+        return new SpringDocUIConfiguration(optionalSwaggerUiConfigProperties);
     }
 }
