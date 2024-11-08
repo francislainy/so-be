@@ -34,6 +34,21 @@ paths:
           description: User logged in successfully
         '401':
           description: Unauthorized
+  /api/v1/questions:
+    post:
+      summary: Ask a question
+      description: This endpoint allows a user to ask a question.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Question'
+      responses:
+        '201':
+          description: Question asked successfully
+        '400':
+          description: Bad request
 components:
   schemas:
     User:
@@ -43,3 +58,17 @@ components:
           type: string
         password:
           type: string
+    Question:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        userId:
+          type: string
+          format: uuid
+      required:
+        - title
+        - content
+        - userId
