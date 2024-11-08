@@ -32,7 +32,7 @@ public class AuthControllerTest {
     @Test
     void shouldRegisterUser() throws Exception {
         User user = User.builder()
-                .username("email.com")
+                .username("username")
                 .password("password")
                 .build();
 
@@ -49,10 +49,9 @@ public class AuthControllerTest {
     @Test
     void shouldLoginUser() throws Exception {
         User userRequest = User.builder()
-                .username("email.com")
+                .username("username")
                 .password("password")
                 .build();
-
 
         User userResponse = userRequest.withId(randomUUID());
 

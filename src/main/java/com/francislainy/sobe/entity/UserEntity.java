@@ -4,12 +4,14 @@ import com.francislainy.sobe.model.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +29,9 @@ public class UserEntity {
     private String password;
 
     private String role;
+
+    @OneToMany(mappedBy = "userEntity")
+    private List<QuestionEntity> questions;
 
     // map to model
     public User toModel() {
