@@ -1,9 +1,9 @@
-package com.francislainy.sobe.service;
+package com.francislainy.sobe.service.auth;
 
 import com.francislainy.sobe.entity.UserEntity;
 import com.francislainy.sobe.model.User;
 import com.francislainy.sobe.repository.UserRepository;
-import com.francislainy.sobe.service.impl.AuthServiceImpl;
+import com.francislainy.sobe.service.impl.auth.AuthServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
