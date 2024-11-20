@@ -1,6 +1,7 @@
 package com.francislainy.sobe.service.question;
 
 import com.francislainy.sobe.entity.QuestionEntity;
+import com.francislainy.sobe.exception.QuestionNotFoundException;
 import com.francislainy.sobe.model.Question;
 import com.francislainy.sobe.repository.QuestionRepository;
 import com.francislainy.sobe.service.impl.question.QuestionServiceImpl;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.francislainy.sobe.exception.AppExceptionHandler.QUESTION_NOT_FOUND_EXCEPTION;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,7 +111,9 @@ public class QuestionServiceTest {
 
         when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> questionService.updateQuestion(questionId, question));
+        Exception e = assertThrows(QuestionNotFoundException.class, () -> questionService.updateQuestion(questionId, question));
+
+        assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
 
         verify(questionRepository, times(1)).findById(questionId);
         verify(questionRepository, never()).save(any(QuestionEntity.class));
