@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
@@ -76,7 +77,7 @@ public class QuestionServiceTest {
         UUID questionId = randomUUID();
         QuestionEntity questionEntity = question.withId(questionId).toEntity();
 
-        when(questionRepository.existsById(any(UUID.class))).thenReturn(true);
+        when(questionRepository.findById(any(UUID.class))).thenReturn(Optional.of(questionEntity));
         when(questionRepository.save(any(QuestionEntity.class))).thenReturn(questionEntity);
 
         Question updatedQuestion = questionService.updateQuestion(questionId, question);
@@ -91,7 +92,7 @@ public class QuestionServiceTest {
                 () -> assertEquals(question.getUserId(), updatedQuestion.getUserId(), "Question user id should match")
         );
 
-        verify(questionRepository, times(1)).existsById(any(UUID.class));
+        verify(questionRepository, times(1)).findById(any(UUID.class));
         verify(questionRepository, times(1)).save(any(QuestionEntity.class));
     }
 
@@ -106,11 +107,11 @@ public class QuestionServiceTest {
 
         UUID questionId = randomUUID();
 
-        when(questionRepository.existsById(questionId)).thenReturn(false);
+        when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> questionService.updateQuestion(questionId, question));
 
-        verify(questionRepository, times(1)).existsById(questionId);
+        verify(questionRepository, times(1)).findById(questionId);
         verify(questionRepository, never()).save(any(QuestionEntity.class));
     }
 }

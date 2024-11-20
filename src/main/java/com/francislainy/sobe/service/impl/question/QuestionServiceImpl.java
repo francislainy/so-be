@@ -24,11 +24,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Question updateQuestion(UUID questionId, Question question) {
-        if (questionRepository.existsById(questionId)) {
-            QuestionEntity questionEntity = question.withId(questionId).toEntity();
-            return questionRepository.save(questionEntity).toModel();
-        }
-
-        throw new RuntimeException("Question not found");
+        QuestionEntity questionEntity = questionRepository.findById(questionId) // todo: add updated at date - 20/11/2024
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        return questionRepository.save(questionEntity).toModel();
     }
 }

@@ -66,7 +66,8 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 () -> assertNotNull(createdQuestion.getId(), "Question id should not be null"),
                 () -> assertEquals(question.getTitle(), createdQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), createdQuestion.getContent(), "Question content should match"),
-                () -> assertEquals(question.getUserId(), createdQuestion.getUserId(), "Question user id should match")
+                () -> assertEquals(question.getUserId(), createdQuestion.getUserId(), "Question user id should match"),
+                () -> assertNotNull(createdQuestion.getCreatedAt(), "Question created at should not be null")
         );
     }
 
@@ -103,7 +104,8 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 () -> assertEquals(questionEntity.getId(), updatedQuestionResponse.getId(), "Question id should match"),
                 () -> assertEquals(updatedQuestionRequest.getTitle(), updatedQuestionResponse.getTitle(), "Question title should match"),
                 () -> assertEquals(updatedQuestionRequest.getContent(), updatedQuestionResponse.getContent(), "Question content should match"),
-                () -> assertEquals(updatedQuestionRequest.getUserId(), updatedQuestionResponse.getUserId(), "Question user id should match")
+                () -> assertEquals(updatedQuestionRequest.getUserId(), updatedQuestionResponse.getUserId(), "Question user id should match"),
+                () -> assertNotNull(updatedQuestionResponse.getCreatedAt(), "Question created at should not be null")
         );
     }
 }
