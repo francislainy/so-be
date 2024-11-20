@@ -1,7 +1,7 @@
-package com.francislainy.sobe.controller;
+package com.francislainy.sobe.controller.auth;
 
 import com.francislainy.sobe.model.User;
-import com.francislainy.sobe.service.impl.AuthServiceImpl;
+import com.francislainy.sobe.service.impl.auth.AuthServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

@@ -49,6 +49,32 @@ paths:
           description: Question asked successfully
         '400':
           description: Bad request
+  /api/v1/questions/{questionId}:
+    put:
+      summary: Update a question
+      description: This endpoint allows a user to update a question.
+      parameters:
+          - name: questionId
+            in: path
+            required: true
+            description: ID of the question to update
+            schema:
+               type: string
+               format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Question'
+      responses:
+        '200':
+          description: Question updated successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Question not found
+
 components:
   schemas:
     User:

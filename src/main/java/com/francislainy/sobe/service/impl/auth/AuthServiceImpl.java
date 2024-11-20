@@ -1,4 +1,4 @@
-package com.francislainy.sobe.service.impl;
+package com.francislainy.sobe.service.impl.auth;
 
 import com.francislainy.sobe.entity.UserEntity;
 import com.francislainy.sobe.model.User;

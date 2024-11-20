@@ -1,4 +1,4 @@
-package com.francislainy.sobe.controller;
+package com.francislainy.sobe.controller.auth;
 
 import com.francislainy.sobe.config.BasePostgresConfig;
 import com.francislainy.sobe.entity.UserEntity;
