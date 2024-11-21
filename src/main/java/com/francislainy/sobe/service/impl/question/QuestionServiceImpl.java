@@ -8,7 +8,6 @@ import com.francislainy.sobe.model.Question;
 import com.francislainy.sobe.repository.QuestionRepository;
 import com.francislainy.sobe.service.QuestionService;
 import com.francislainy.sobe.service.impl.CurrentUserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
