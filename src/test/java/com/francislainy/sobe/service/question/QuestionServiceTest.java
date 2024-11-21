@@ -1,9 +1,12 @@
 package com.francislainy.sobe.service.question;
 
 import com.francislainy.sobe.entity.QuestionEntity;
+import com.francislainy.sobe.entity.UserEntity;
+import com.francislainy.sobe.exception.EntityDoesNotBelongToUserException;
 import com.francislainy.sobe.exception.QuestionNotFoundException;
 import com.francislainy.sobe.model.Question;
 import com.francislainy.sobe.repository.QuestionRepository;
+import com.francislainy.sobe.service.impl.CurrentUserService;
 import com.francislainy.sobe.service.impl.question.QuestionServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.francislainy.sobe.exception.AppExceptionHandler.ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION;
 import static com.francislainy.sobe.exception.AppExceptionHandler.QUESTION_NOT_FOUND_EXCEPTION;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -35,6 +39,9 @@ public class QuestionServiceTest {
 
     @Mock
     QuestionRepository questionRepository;
+
+    @Mock
+    CurrentUserService currentUserService;
 
     @Test
     void shouldCreateQuestion() {
@@ -69,18 +76,34 @@ public class QuestionServiceTest {
 
     @Test
     void shouldUpdateQuestion() {
-        Question question = Question.builder()
-                .title("question")
-                .content("content")
-                .userId(randomUUID())
+        UUID ownerId = randomUUID();
+
+        UUID questionId = randomUUID();
+        QuestionEntity originalQuestionEntity = QuestionEntity.builder()
+                .id(questionId)
+                .title("Original question")
+                .content("Original content")
+                .userEntity(UserEntity.builder().id(ownerId).build())
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        UUID questionId = randomUUID();
-        QuestionEntity questionEntity = question.withId(questionId).toEntity();
+        Question question = Question.builder()
+                .title("Updated question")
+                .content("Updated content")
+                .userId(ownerId)
+                .createdAt(LocalDateTime.now())
+                .build();
+        QuestionEntity updatedQuestionEntity = question.withId(questionId).toEntity();
 
-        when(questionRepository.findById(any(UUID.class))).thenReturn(Optional.of(questionEntity));
-        when(questionRepository.save(any(QuestionEntity.class))).thenReturn(questionEntity);
+        UserEntity currentUser = UserEntity.builder()
+                .id(ownerId)
+                .username("testuser")
+                .password("password")
+                .build();
+
+        when(questionRepository.findById(questionId)).thenReturn(Optional.of(originalQuestionEntity));
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(questionRepository.save(any(QuestionEntity.class))).thenReturn(updatedQuestionEntity);
 
         Question updatedQuestion = questionService.updateQuestion(questionId, question);
 
@@ -90,13 +113,52 @@ public class QuestionServiceTest {
                 () -> assertEquals(questionId, updatedQuestion.getId(), "Question id should match"),
                 () -> assertEquals(question.getTitle(), updatedQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), updatedQuestion.getContent(), "Question content should match"),
-                () -> assertEquals(question.getCreatedAt(), updatedQuestion.getCreatedAt(), "Question created at should match"),
-                () -> assertEquals(question.getUserId(), updatedQuestion.getUserId(), "Question user id should match")
+                () -> assertEquals(ownerId, updatedQuestion.getUserId(), "Question user id should match")
         );
 
-        verify(questionRepository, times(1)).findById(any(UUID.class));
+        verify(questionRepository, times(1)).findById(questionId);
+        verify(currentUserService, times(1)).getCurrentUser();
         verify(questionRepository, times(1)).save(any(QuestionEntity.class));
     }
+
+    @Test
+    void shouldNotUpdateQuestionWhenNotOwner() {
+        UUID ownerId = randomUUID();
+        UUID questionId = randomUUID();
+
+        Question question = Question.builder()
+                .title("Updated question")
+                .content("Updated content")
+                .userId(ownerId)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        UserEntity currentUser = UserEntity.builder()
+                .id(randomUUID())
+                .username("testuser")
+                .password("password")
+                .build();
+
+        QuestionEntity originalQuestionEntity = QuestionEntity.builder()
+                .id(questionId)
+                .title("Original question")
+                .content("Original content")
+                .userEntity(UserEntity.builder().id(ownerId).build())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        when(questionRepository.findById(questionId)).thenReturn(Optional.of(originalQuestionEntity));
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+
+        Exception e = assertThrows(EntityDoesNotBelongToUserException.class, () -> questionService.updateQuestion(questionId, question));
+
+        assertEquals(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(questionRepository, times(1)).findById(questionId);
+        verify(currentUserService, times(1)).getCurrentUser();
+        verify(questionRepository, never()).save(any(QuestionEntity.class));
+    }
+
 
     @Test
     void shouldNotUpdateQuestionWhenQuestionNotFound() {
