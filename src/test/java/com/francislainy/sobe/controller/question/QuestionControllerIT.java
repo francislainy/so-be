@@ -7,10 +7,13 @@ import com.francislainy.sobe.model.Question;
 import com.francislainy.sobe.model.User;
 import com.francislainy.sobe.repository.QuestionRepository;
 import com.francislainy.sobe.repository.UserRepository;
+import com.francislainy.sobe.service.impl.CurrentUserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +28,8 @@ import static com.francislainy.sobe.util.TestUtil.toJson;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,17 +46,27 @@ public class QuestionControllerIT extends BasePostgresConfig {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    private QuestionRepository questionRepository;
+    QuestionRepository questionRepository;
 
-    @Test
-    @WithMockUser
-    void testCreateQuestion() throws Exception {
-        UserEntity userEntity = userRepository.save(User.builder()
+    @MockBean
+    CurrentUserService currentUserService;
+
+    UserEntity userEntity;
+
+    @BeforeEach
+    void setUp() {
+        userEntity = userRepository.save(User.builder()
                 .username("user")
                 .password("password")
                 .role("USER")
                 .build().toEntity());
 
+        when(currentUserService.getCurrentUser()).thenReturn(userEntity);
+    }
+
+    @Test
+    @WithMockUser
+    void testCreateQuestion() throws Exception {
         Question question = Question.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
@@ -91,12 +106,6 @@ public class QuestionControllerIT extends BasePostgresConfig {
     @Test
     @WithMockUser
     void testUpdateQuestion() throws Exception {
-        UserEntity userEntity = userRepository.save(User.builder()
-                .username("user")
-                .password("password")
-                .role("USER")
-                .build().toEntity());
-
         QuestionEntity questionEntity = QuestionEntity.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
@@ -129,12 +138,6 @@ public class QuestionControllerIT extends BasePostgresConfig {
 
     @Test
     void shouldNotUpdateQuestionWhenNotAuthenticated() throws Exception {
-        UserEntity userEntity = userRepository.save(User.builder()
-                .username("user")
-                .password("password")
-                .role("USER")
-                .build().toEntity());
-
         QuestionEntity questionEntity = questionRepository.save(QuestionEntity.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
@@ -154,14 +157,8 @@ public class QuestionControllerIT extends BasePostgresConfig {
     }
 
     @Test
-    @WithMockUser(username = "anotherUser")
+    @WithMockUser
     void shouldNotUpdateQuestionWhenNotTheQuestionCreator() throws Exception {
-        UserEntity userEntity = userRepository.save(User.builder()
-                .username("user")
-                .password("password")
-                .role("USER")
-                .build().toEntity());
-
         UserEntity anotherUserEntity = userRepository.save(User.builder()
                 .username("anotherUser")
                 .password("password")
@@ -172,18 +169,65 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
                 .createdAt(LocalDateTime.now())
-                .userEntity(userEntity)
+                .userEntity(anotherUserEntity)
                 .build());
 
         Question updatedQuestionRequest = Question.builder()
                 .title("How to update a question?")
                 .content("I am trying to update a question but I am not sure how to do it.")
-                .userId(anotherUserEntity.getId())
                 .build();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionEntity.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(updatedQuestionRequest)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION));
+    }
+
+    @Test
+    @WithMockUser
+    void testDeleteQuestion() throws Exception {
+        QuestionEntity questionEntity = questionRepository.save(QuestionEntity.builder()
+                .title("How to create a question?")
+                .content("I am trying to create a question but I am not sure how to do it.")
+                .createdAt(LocalDateTime.now())
+                .userEntity(userEntity)
+                .build());
+
+        mockMvc.perform(delete("/api/v1/questions/{questionId}", questionEntity.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldNotDeleteQuestionWhenNotAuthenticated() throws Exception {
+        QuestionEntity questionEntity = questionRepository.save(QuestionEntity.builder()
+                .title("How to create a question?")
+                .content("I am trying to create a question but I am not sure how to do it.")
+                .userEntity(userEntity)
+                .build());
+
+        mockMvc.perform(delete("/api/v1/questions/{questionId}", questionEntity.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void shouldNotDeleteQuestionWhenNotTheQuestionCreator() throws Exception {
+        UserEntity anotherUserEntity = userRepository.save(User.builder()
+                .username("anotherUser")
+                .password("password")
+                .role("USER")
+                .build().toEntity());
+
+        QuestionEntity questionEntity = questionRepository.save(QuestionEntity.builder()
+                .title("How to create a question?")
+                .content("I am trying to create a question but I am not sure how to do it.")
+                .createdAt(LocalDateTime.now())
+                .userEntity(anotherUserEntity)
+                .build());
+
+        mockMvc.perform(delete("/api/v1/questions/{questionId}", questionEntity.getId())
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION));
     }

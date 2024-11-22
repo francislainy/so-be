@@ -177,4 +177,61 @@ public class QuestionServiceTest {
         verify(questionRepository, times(1)).findById(questionId);
         verify(questionRepository, never()).save(any(QuestionEntity.class));
     }
+
+    @Test
+    void shouldDeleteQuestion() {
+        UserEntity currentUser = UserEntity.builder()
+                .id(randomUUID())
+                .username("testuser")
+                .password("password")
+                .build();
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+
+        UUID questionId = randomUUID();
+
+        QuestionEntity questionEntity = QuestionEntity.builder().id(questionId).userEntity(currentUser).build();
+        when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionEntity));
+
+        questionService.deleteQuestion(questionId);
+        verify(questionRepository, times(1)).deleteById(questionId);
+    }
+
+    @Test
+    void shouldNotDeleteQuestionWhenQuestionNotFound() {
+        UUID questionId = randomUUID();
+        when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
+
+        Exception e = assertThrows(QuestionNotFoundException.class, () -> questionService.deleteQuestion(questionId));
+
+        assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(questionRepository, never()).deleteById(questionId);
+    }
+
+    @Test
+    void shouldNotDeleteQuestionWhenUserIsNotOwner() {
+        UserEntity currentUser = UserEntity.builder()
+                .id(randomUUID())
+                .username("testuser")
+                .password("password")
+                .build();
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+
+        UserEntity anotherUser = UserEntity.builder()
+                .id(randomUUID())
+                .username("anotheruser")
+                .password("password")
+                .build();
+
+        UUID questionId = randomUUID();
+
+        QuestionEntity questionEntity = QuestionEntity.builder().id(questionId).userEntity(anotherUser).build();
+        when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionEntity));
+
+        Exception e = assertThrows(EntityDoesNotBelongToUserException.class, () -> questionService.deleteQuestion(questionId));
+
+        assertEquals(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION, e.getMessage());
+
+        verify(questionRepository, never()).deleteById(questionId);
+    }
 }

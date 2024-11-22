@@ -8,4 +8,6 @@ public interface QuestionService {
     Question createQuestion(Question question);
 
     Question updateQuestion(UUID questionID, Question question);
+
+    void deleteQuestion(UUID questionID);
 }
