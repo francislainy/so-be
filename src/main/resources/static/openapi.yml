@@ -74,6 +74,22 @@ paths:
           description: Bad request
         '404':
           description: Question not found
+    delete:
+      summary: Delete a question
+      description: This endpoint allows a user to delete a question.
+      parameters:
+          - name: questionId
+            in: path
+            required: true
+            description: ID of the question to delete
+            schema:
+               type: string
+               format: uuid
+      responses:
+        '204':
+          description: Question deleted successfully
+        '404':
+          description: Question not found
 
 components:
   schemas:
