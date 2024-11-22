@@ -46,4 +46,19 @@ public class QuestionServiceImpl implements QuestionService {
 
         return questionRepository.save(questionEntity).toModel();
     }
+
+    @Override
+    public void deleteQuestion(UUID questionID) {
+        UserEntity currentUser = currentUserService.getCurrentUser();
+
+        QuestionEntity questionEntity = questionRepository.findById(questionID)
+                .orElseThrow(() -> new QuestionNotFoundException(QUESTION_NOT_FOUND_EXCEPTION));
+
+        // Check ownership
+        if (!questionEntity.getUserEntity().getId().equals(currentUser.getId())) {
+            throw new EntityDoesNotBelongToUserException(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION);
+        }
+
+        questionRepository.deleteById(questionEntity.getId());
+    }
 }
