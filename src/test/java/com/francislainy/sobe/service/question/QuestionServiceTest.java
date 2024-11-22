@@ -68,8 +68,7 @@ public class QuestionServiceTest {
                 () -> assertEquals(question.getTitle(), createdQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), createdQuestion.getContent(), "Question content should match"),
                 () -> assertEquals(question.getCreatedAt(), createdQuestion.getCreatedAt(), "Question created at should match"),
-                () -> assertEquals(userId, createdQuestion.getUserId(), "Question user id should match")
-        );
+                () -> assertEquals(userId, createdQuestion.getUserId(), "Question user id should match"));
 
         verify(questionRepository).save(any(QuestionEntity.class));
     }
@@ -113,8 +112,7 @@ public class QuestionServiceTest {
                 () -> assertEquals(questionId, updatedQuestion.getId(), "Question id should match"),
                 () -> assertEquals(question.getTitle(), updatedQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), updatedQuestion.getContent(), "Question content should match"),
-                () -> assertEquals(ownerId, updatedQuestion.getUserId(), "Question user id should match")
-        );
+                () -> assertEquals(ownerId, updatedQuestion.getUserId(), "Question user id should match"));
 
         verify(questionRepository, times(1)).findById(questionId);
         verify(currentUserService, times(1)).getCurrentUser();
@@ -158,7 +156,6 @@ public class QuestionServiceTest {
         verify(currentUserService, times(1)).getCurrentUser();
         verify(questionRepository, never()).save(any(QuestionEntity.class));
     }
-
 
     @Test
     void shouldNotUpdateQuestionWhenQuestionNotFound() {

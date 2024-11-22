@@ -39,8 +39,8 @@ public class AuthControllerTest {
         when(authService.registerUser(user)).thenReturn(user);
 
         mockMvc.perform(post("/api/v1/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(user)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(user)))
                 .andExpect(status().isCreated());
 
         verify(authService, times(1)).registerUser(user);
@@ -58,8 +58,8 @@ public class AuthControllerTest {
         when(authService.loginUser(userRequest)).thenReturn(userResponse);
 
         mockMvc.perform(post("/api/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(userRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(userRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(toJson(userResponse)));
 

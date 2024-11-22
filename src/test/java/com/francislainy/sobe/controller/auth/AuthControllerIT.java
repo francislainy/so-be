@@ -93,8 +93,8 @@ public class AuthControllerIT extends BasePostgresConfig {
         User user = savedUser.toModel();
 
         mockMvc.perform(post("/api/v1/test-admin")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(user)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(user)))
                 .andExpect(status().isCreated());
     }
 }

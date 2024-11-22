@@ -6,4 +6,3 @@ public class EntityDoesNotBelongToUserException extends RuntimeException {
         super(message);
     }
 }
-
