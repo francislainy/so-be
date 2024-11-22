@@ -59,8 +59,8 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 .build();
 
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/questions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -71,8 +71,7 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 () -> assertEquals(question.getTitle(), createdQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), createdQuestion.getContent(), "Question content should match"),
                 () -> assertEquals(question.getUserId(), createdQuestion.getUserId(), "Question user id should match"),
-                () -> assertNotNull(createdQuestion.getCreatedAt(), "Question created at should not be null")
-        );
+                () -> assertNotNull(createdQuestion.getCreatedAt(), "Question created at should not be null"));
     }
 
     @Test
@@ -84,8 +83,8 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 .build();
 
         mockMvc.perform(post("/api/v1/questions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -106,15 +105,14 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 .build();
         questionEntity = questionRepository.saveAndFlush(questionEntity);
 
-
         Question updatedQuestionRequest = Question.builder()
                 .title("How to update a question?")
                 .content("I am trying to update a question but I am not sure how to do it.")
                 .build();
 
         MvcResult updatedMvcResult = mockMvc.perform(put("/api/v1/questions/{questionId}", questionEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(updatedQuestionRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(updatedQuestionRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -126,8 +124,7 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 () -> assertEquals(updatedQuestionRequest.getTitle(), updatedQuestionResponse.getTitle(), "title should match"),
                 () -> assertEquals(updatedQuestionRequest.getContent(), updatedQuestionResponse.getContent(), "content should match"),
                 () -> assertEquals(userEntity.getId(), updatedQuestionResponse.getUserId(), "user id should match"),
-                () -> assertEquals(finalQuestionEntity.getCreatedAt().toLocalDate(), updatedQuestionResponse.getCreatedAt().toLocalDate(), "created at should match")
-        );
+                () -> assertEquals(finalQuestionEntity.getCreatedAt().toLocalDate(), updatedQuestionResponse.getCreatedAt().toLocalDate(), "created at should match"));
     }
 
     @Test
@@ -151,8 +148,8 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 .build();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(updatedQuestionRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(updatedQuestionRequest)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -185,8 +182,8 @@ public class QuestionControllerIT extends BasePostgresConfig {
                 .build();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(updatedQuestionRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(updatedQuestionRequest)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION));
     }

@@ -44,8 +44,8 @@ public class QuestionControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/v1/questions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isCreated());
 
         verify(questionService, times(1)).createQuestion(any(Question.class));
@@ -62,8 +62,8 @@ public class QuestionControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/v1/questions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).createQuestion(any(Question.class));
@@ -80,8 +80,8 @@ public class QuestionControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/v1/questions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).createQuestion(any(Question.class));
@@ -98,8 +98,8 @@ public class QuestionControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/v1/questions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).createQuestion(any(Question.class));
@@ -116,8 +116,8 @@ public class QuestionControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/v1/questions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).createQuestion(any(Question.class));
@@ -135,8 +135,8 @@ public class QuestionControllerTest {
         UUID questionId = randomUUID();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isOk());
 
         verify(questionService, times(1)).updateQuestion(any(UUID.class), any(Question.class));
@@ -154,8 +154,8 @@ public class QuestionControllerTest {
         UUID questionId = randomUUID();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).updateQuestion(any(UUID.class), any(Question.class));
@@ -173,8 +173,8 @@ public class QuestionControllerTest {
         UUID questionId = randomUUID();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).updateQuestion(any(UUID.class), any(Question.class));
@@ -192,8 +192,8 @@ public class QuestionControllerTest {
         UUID questionId = randomUUID();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).updateQuestion(any(UUID.class), any(Question.class));
@@ -211,8 +211,8 @@ public class QuestionControllerTest {
         UUID questionId = randomUUID();
 
         mockMvc.perform(put("/api/v1/questions/{questionId}", questionId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(question)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(question)))
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).updateQuestion(any(UUID.class), any(Question.class));

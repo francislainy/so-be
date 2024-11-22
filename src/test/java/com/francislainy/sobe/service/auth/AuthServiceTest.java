@@ -39,18 +39,17 @@ public class AuthServiceTest {
 
         UserEntity userEntity = user.withId(randomUUID()).toEntity();
 
-       when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
-       User registeredUser = authService.registerUser(user);
-       assertNotNull(registeredUser, "User should not be null");
+        User registeredUser = authService.registerUser(user);
+        assertNotNull(registeredUser, "User should not be null");
 
-       assertAll(
+        assertAll(
                 () -> assertNotNull(registeredUser.getId(), "User id should not be null"),
                 () -> assertNotNull(registeredUser.getUsername(), "User username should not be null"),
-                () -> assertNotNull(registeredUser.getPassword(), "User password should not be null")
-       );
+                () -> assertNotNull(registeredUser.getPassword(), "User password should not be null"));
 
-       verify(userRepository, times(1)).save(any(UserEntity.class));
+        verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
     @Test
@@ -70,8 +69,7 @@ public class AuthServiceTest {
         assertAll(
                 () -> assertNotNull(userResponse.getId(), "User id should not be null"),
                 () -> assertNotNull(userResponse.getUsername(), "User username should not be null"),
-                () -> assertNotNull(userResponse.getPassword(), "User password should not be null")
-        );
+                () -> assertNotNull(userResponse.getPassword(), "User password should not be null"));
 
         verify(userRepository, times(1)).findByUsername(any(String.class));
     }

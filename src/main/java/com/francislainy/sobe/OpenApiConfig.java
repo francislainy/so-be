@@ -14,7 +14,7 @@ import java.util.Optional;
 public class OpenApiConfig {
 
     @Bean
-    SpringDocConfiguration springDocConfiguration(){
+    SpringDocConfiguration springDocConfiguration() {
         return new SpringDocConfiguration();
     }
 
@@ -24,12 +24,12 @@ public class OpenApiConfig {
     }
 
     @Bean
-    ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties){
+    ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties) {
         return new ObjectMapperProvider(springDocConfigProperties);
     }
 
     @Bean
-    SpringDocUIConfiguration SpringDocUIConfiguration(Optional<SwaggerUiConfigProperties> optionalSwaggerUiConfigProperties){
+    SpringDocUIConfiguration SpringDocUIConfiguration(Optional<SwaggerUiConfigProperties> optionalSwaggerUiConfigProperties) {
         return new SpringDocUIConfiguration(optionalSwaggerUiConfigProperties);
     }
 }
