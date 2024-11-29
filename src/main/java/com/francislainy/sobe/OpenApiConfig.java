@@ -33,3 +33,7 @@ public class OpenApiConfig {
         return new SpringDocUIConfiguration(optionalSwaggerUiConfigProperties);
     }
 }
+
+
+
+// test
