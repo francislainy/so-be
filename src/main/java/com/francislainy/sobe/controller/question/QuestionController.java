@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,6 +29,11 @@ public class QuestionController {
         return new ResponseEntity<>(questionService.createQuestion(question), HttpStatus.CREATED);
     }
 
+    @GetMapping("/{questionId}")
+    public ResponseEntity<Question> getQuestion(@PathVariable UUID questionId) {
+        return new ResponseEntity<>(questionService.getQuestion(questionId), HttpStatus.OK);
+    }
+
     @PutMapping("/{questionId}")
     public ResponseEntity<Question> updateQuestion(@PathVariable UUID questionId, @Valid @RequestBody Question question) {
         return new ResponseEntity<>(questionService.updateQuestion(questionId, question), HttpStatus.OK);
@@ -38,5 +44,4 @@ public class QuestionController {
         questionService.deleteQuestion(questionId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }

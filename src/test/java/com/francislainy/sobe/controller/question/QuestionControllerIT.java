@@ -104,6 +104,35 @@ public class QuestionControllerIT extends BasePostgresConfig {
     }
 
     @Test
+    void shouldRetrieveAQuestion() {
+        QuestionEntity questionEntity = questionRepository.save(QuestionEntity.builder()
+                .title("How to create a question?")
+                .content("I am trying to create a question but I am not sure how to do it.")
+                .createdAt(LocalDateTime.now())
+                .userEntity(userEntity)
+                .build());
+
+        Question question = Question.builder()
+                .id(questionEntity.getId())
+                .title(questionEntity.getTitle())
+                .content(questionEntity.getContent())
+                .createdAt(questionEntity.getCreatedAt())
+                .userId(userEntity.getId())
+                .build();
+
+        Question retrievedQuestion = questionRepository.findById(questionEntity.getId()).orElseThrow().toModel();
+        assertNotNull(retrievedQuestion, "Retrieved question should not be null");
+
+        assertAll(
+                () -> assertEquals(question.getId(), retrievedQuestion.getId(), "id should match"),
+                () -> assertEquals(question.getTitle(), retrievedQuestion.getTitle(), "title should match"),
+                () -> assertEquals(question.getContent(), retrievedQuestion.getContent(), "content should match"),
+                () -> assertEquals(question.getUserId(), retrievedQuestion.getUserId(), "user id should match"),
+                () -> assertEquals(question.getCreatedAt().toLocalDate(), retrievedQuestion.getCreatedAt().toLocalDate(), "created at should match")
+        );
+    }
+
+    @Test
     @WithMockUser
     void shouldUpdateQuestion() throws Exception {
         QuestionEntity questionEntity = QuestionEntity.builder()

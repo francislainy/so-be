@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -122,6 +123,14 @@ public class QuestionControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(questionService, never()).createQuestion(any(Question.class));
+    }
+
+    @Test
+    void shouldRetrieveAQuestion() throws Exception {
+        UUID questionId = randomUUID();
+        mockMvc.perform(get("/api/v1/questions/{questionId}", questionId))
+                .andExpect(status().isOk());
+        verify(questionService, times(1)).getQuestion(any(UUID.class));
     }
 
     @Test
