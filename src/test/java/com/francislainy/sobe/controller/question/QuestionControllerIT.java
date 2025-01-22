@@ -66,7 +66,7 @@ public class QuestionControllerIT extends BasePostgresConfig {
 
     @Test
     @WithMockUser
-    void testCreateQuestion() throws Exception {
+    void shouldCreateQuestion() throws Exception {
         Question question = Question.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
@@ -105,7 +105,7 @@ public class QuestionControllerIT extends BasePostgresConfig {
 
     @Test
     @WithMockUser
-    void testUpdateQuestion() throws Exception {
+    void shouldUpdateQuestion() throws Exception {
         QuestionEntity questionEntity = QuestionEntity.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
@@ -186,7 +186,7 @@ public class QuestionControllerIT extends BasePostgresConfig {
 
     @Test
     @WithMockUser
-    void testDeleteQuestion() throws Exception {
+    void shouldDeleteQuestion() throws Exception {
         QuestionEntity questionEntity = questionRepository.save(QuestionEntity.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
