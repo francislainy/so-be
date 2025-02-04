@@ -74,6 +74,47 @@ public class QuestionServiceTest {
     }
 
     @Test
+    void shouldRetrieveAQuestion() {
+        UUID questionId = randomUUID();
+        UUID userId = randomUUID();
+
+        QuestionEntity questionEntity = QuestionEntity.builder()
+                .id(questionId)
+                .title("question")
+                .content("content")
+                .userEntity(UserEntity.builder().id(userId).build())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        when(questionRepository.findById(questionId)).thenReturn(Optional.of(questionEntity));
+
+        Question question = questionService.getQuestion(questionId);
+
+        assertNotNull(question, "Question should not be null");
+
+        assertAll(
+                () -> assertEquals(questionId, question.getId(), "Question id should match"),
+                () -> assertEquals(questionEntity.getTitle(), question.getTitle(), "Question title should match"),
+                () -> assertEquals(questionEntity.getContent(), question.getContent(), "Question content should match"),
+                () -> assertEquals(questionEntity.getCreatedAt(), question.getCreatedAt(), "Question created at should match"),
+                () -> assertEquals(userId, question.getUserId(), "Question user id should match"));
+
+        verify(questionRepository, times(1)).findById(questionId);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenQuestionNotFound() {
+        UUID questionId = randomUUID();
+        when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
+
+        Exception e = assertThrows(QuestionNotFoundException.class, () -> questionService.getQuestion(questionId));
+
+        assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(questionRepository, times(1)).findById(questionId);
+    }
+
+    @Test
     void shouldUpdateQuestion() {
         UUID ownerId = randomUUID();
 

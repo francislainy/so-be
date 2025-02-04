@@ -31,6 +31,13 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    public Question getQuestion(UUID questionId) {
+        return questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException(QUESTION_NOT_FOUND_EXCEPTION))
+                .toModel();
+    }
+
+    @Override
     public Question updateQuestion(UUID questionId, Question question) {
         UserEntity currentUser = currentUserService.getCurrentUser();
 
