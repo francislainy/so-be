@@ -1,11 +1,10 @@
 package com.francislainy.sobe.entity;
 
-import com.francislainy.sobe.model.Question;
+import com.francislainy.sobe.model.Answer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,41 +13,34 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "questions")
+@Table(name = "answers")
 @Getter
 @Setter
 @Builder
 @With
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionEntity {
+public class AnswerEntity {
 
     @Id
     @GeneratedValue
     private UUID id;
-    private String title;
+
     private String content;
-    private LocalDateTime createdAt;
 
     @ManyToOne
-    private UserEntity userEntity;
+    private QuestionEntity questionEntity;
 
-    @OneToMany
-    private List<AnswerEntity> answers;
-
-    // map to model
-    public Question toModel() {
-        return Question.builder()
+    // to model
+    public Answer toModel() {
+        return Answer.builder()
                 .id(id)
-                .title(title)
                 .content(content)
-                .userId(userEntity.getId())
-                .createdAt(createdAt)
+                .questionId(questionEntity.getId())
                 .build();
     }
+
 }
