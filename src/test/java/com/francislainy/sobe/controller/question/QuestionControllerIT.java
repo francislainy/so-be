@@ -94,7 +94,6 @@ public class QuestionControllerIT extends BasePostgresConfig {
         Question question = Question.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
-                .userId(null)
                 .build();
 
         mockMvc.perform(post("/api/v1/questions")
