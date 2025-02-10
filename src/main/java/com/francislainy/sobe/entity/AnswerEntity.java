@@ -34,13 +34,16 @@ public class AnswerEntity {
     @ManyToOne
     private QuestionEntity questionEntity;
 
+    @ManyToOne
+    private UserEntity userEntity;
+
     // to model
     public Answer toModel() {
         return Answer.builder()
                 .id(id)
                 .content(content)
                 .questionId(questionEntity.getId())
+                .userId(userEntity.getId())
                 .build();
     }
-
 }

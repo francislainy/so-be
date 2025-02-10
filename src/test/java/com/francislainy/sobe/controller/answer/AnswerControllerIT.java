@@ -48,6 +48,8 @@ public class AnswerControllerIT extends BasePostgresConfig {
 
     UserEntity userEntity;
 
+    QuestionEntity questionEntity;
+
     @BeforeEach
     void setUp() {
         userEntity = userRepository.save(User.builder()
@@ -57,22 +59,23 @@ public class AnswerControllerIT extends BasePostgresConfig {
                 .build().toEntity());
 
         when(currentUserService.getCurrentUser()).thenReturn(userEntity);
-    }
 
-    @Test
-    @WithMockUser
-    void shouldCreateAnswerToQuestion() throws Exception {
         Question question = Question.builder()
                 .title("How to create a question?")
                 .content("I am trying to create a question but I am not sure how to do it.")
                 .userId(userEntity.getId())
                 .build();
-        QuestionEntity questionEntity = questionRepository.save(question.toEntity());
+        questionEntity = questionRepository.save(question.toEntity());
+    }
 
+    @Test
+    @WithMockUser
+    void shouldCreateAnswerToQuestion() throws Exception {
         Answer answer = Answer
                 .builder()
-                .questionId(questionEntity.getId())
                 .content("This is an answer")
+                .questionId(questionEntity.getId())
+                .userId(userEntity.getId())
                 .build();
 
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/questions/{questionId}/answers", questionEntity.getId())
@@ -86,8 +89,23 @@ public class AnswerControllerIT extends BasePostgresConfig {
 
         assertAll(
                 () -> assertNotNull(createdAnswer.getQuestionId(), "Question ID should not be null"),
+                () -> assertNotNull(createdAnswer.getUserId(), "User ID should not be null"),
                 () -> assertNotNull(createdAnswer.getId(), "Answer ID should not be null"),
                 () -> assertEquals(answer.getContent(), createdAnswer.getContent(), "Answer content should match")
         );
+    }
+
+    @Test
+    void shouldNotCreateAnswerWhenUserIsNotAuthenticated() throws Exception {
+        Answer answer = Answer
+                .builder()
+                .content("This is an answer")
+                .questionId(questionEntity.getId())
+                .build();
+
+        mockMvc.perform(post("/api/v1/questions/{questionId}/answers", questionEntity.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(answer)))
+                .andExpect(status().isUnauthorized());
     }
 }

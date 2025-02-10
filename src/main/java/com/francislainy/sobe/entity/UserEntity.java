@@ -35,6 +35,9 @@ public class UserEntity {
     @OneToMany(mappedBy = "userEntity")
     private List<QuestionEntity> questions;
 
+    @OneToMany(mappedBy = "userEntity")
+    private List<AnswerEntity> answers;
+
     // map to model
     public User toModel() {
         return User.builder()
