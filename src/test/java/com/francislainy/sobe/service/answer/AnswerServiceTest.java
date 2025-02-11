@@ -2,11 +2,14 @@ package com.francislainy.sobe.service.answer;
 
 import com.francislainy.sobe.entity.AnswerEntity;
 import com.francislainy.sobe.entity.QuestionEntity;
+import com.francislainy.sobe.entity.UserEntity;
+import com.francislainy.sobe.exception.EntityDoesNotBelongToUserException;
 import com.francislainy.sobe.exception.EntityNotFoundException;
 import com.francislainy.sobe.exception.QuestionNotFoundException;
 import com.francislainy.sobe.model.Answer;
 import com.francislainy.sobe.repository.AnswerRepository;
 import com.francislainy.sobe.repository.QuestionRepository;
+import com.francislainy.sobe.service.impl.CurrentUserService;
 import com.francislainy.sobe.service.impl.answer.AnswerServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.francislainy.sobe.exception.AppExceptionHandler.ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION;
 import static com.francislainy.sobe.exception.AppExceptionHandler.ENTITY_NOT_FOUND_EXCEPTION;
 import static com.francislainy.sobe.exception.AppExceptionHandler.QUESTION_NOT_FOUND_EXCEPTION;
 import static java.util.UUID.randomUUID;
@@ -25,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,6 +45,9 @@ public class AnswerServiceTest {
 
     @Mock
     QuestionRepository questionRepository;
+
+    @Mock
+    CurrentUserService currentUserService;
 
     @Test
     void shouldCreateAnswer() {
@@ -88,19 +96,26 @@ public class AnswerServiceTest {
 
     @Test
     void shouldDeleteAnswer() {
+        UserEntity currentUser = UserEntity.builder()
+                .id(randomUUID())
+                .username("testuser")
+                .password("password")
+                .build();
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+
         UUID questionId = randomUUID();
         UUID answerId = randomUUID();
 
         when(questionRepository.existsById(any(UUID.class))).thenReturn(true);
-        when(answerRepository.findById(any(UUID.class))).thenReturn(Optional.of(AnswerEntity.builder().id(answerId).build()));
+        AnswerEntity answerEntity = AnswerEntity.builder().id(answerId).userEntity(currentUser).build();
+        when(answerRepository.findById(any(UUID.class))).thenReturn(Optional.of(answerEntity));
 
         answerService.deleteAnswer(questionId, answerId);
-
         verify(answerRepository, times(1)).deleteById(answerId);
     }
 
     @Test
-    void shouldNotDeleteAnswerWhenQuestionIsNotFound() {
+    void shouldThrowExceptionWhenQuestionIsNotFoundOnDeletion() {
         UUID questionId = randomUUID();
         UUID answerId = randomUUID();
 
@@ -111,7 +126,7 @@ public class AnswerServiceTest {
     }
 
     @Test
-    void shouldNotDeleteAnswerWhenAnswerIsNotFound() {
+    void shouldThrowExceptionWhenAnswerIsNotFoundOnDeletion() {
         UUID questionId = randomUUID();
         UUID answerId = randomUUID();
 
@@ -120,5 +135,34 @@ public class AnswerServiceTest {
 
         Exception e = assertThrows(EntityNotFoundException.class, () -> answerService.deleteAnswer(questionId, answerId));
         assertEquals(ENTITY_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+    }
+
+    @Test
+    void shouldNotDeleteAnswerWhenUserIsNotTheOwner() {
+        UserEntity currentUser = UserEntity.builder()
+                .id(randomUUID())
+                .username("testuser")
+                .password("password")
+                .build();
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+
+        UserEntity anotherUser = UserEntity.builder()
+                .id(randomUUID())
+                .username("anotheruser")
+                .password("password")
+                .build();
+
+        UUID questionId = randomUUID();
+        UUID answerId = randomUUID();
+
+        when(questionRepository.existsById(any(UUID.class))).thenReturn(true);
+        AnswerEntity answerEntity = AnswerEntity.builder().id(answerId).userEntity(anotherUser).build();
+        when(answerRepository.findById(any(UUID.class))).thenReturn(Optional.of(answerEntity));
+
+        Exception e = assertThrows(EntityDoesNotBelongToUserException.class, () -> answerService.deleteAnswer(questionId, answerId));
+
+        assertEquals(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(answerRepository, never()).deleteById(answerId);
     }
 }
