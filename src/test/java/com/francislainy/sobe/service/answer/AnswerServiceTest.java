@@ -2,6 +2,7 @@ package com.francislainy.sobe.service.answer;
 
 import com.francislainy.sobe.entity.AnswerEntity;
 import com.francislainy.sobe.entity.QuestionEntity;
+import com.francislainy.sobe.exception.EntityNotFoundException;
 import com.francislainy.sobe.exception.QuestionNotFoundException;
 import com.francislainy.sobe.model.Answer;
 import com.francislainy.sobe.repository.AnswerRepository;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.francislainy.sobe.exception.AppExceptionHandler.ENTITY_NOT_FOUND_EXCEPTION;
 import static com.francislainy.sobe.exception.AppExceptionHandler.QUESTION_NOT_FOUND_EXCEPTION;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -23,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,5 +84,41 @@ public class AnswerServiceTest {
 
         Exception e = assertThrows(QuestionNotFoundException.class, () -> answerService.createAnswer(questionId, answer));
         assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+    }
+
+    @Test
+    void shouldDeleteAnswer() {
+        UUID questionId = randomUUID();
+        UUID answerId = randomUUID();
+
+        when(questionRepository.existsById(any(UUID.class))).thenReturn(true);
+        when(answerRepository.findById(any(UUID.class))).thenReturn(Optional.of(AnswerEntity.builder().id(answerId).build()));
+
+        answerService.deleteAnswer(questionId, answerId);
+
+        verify(answerRepository, times(1)).deleteById(answerId);
+    }
+
+    @Test
+    void shouldNotDeleteAnswerWhenQuestionIsNotFound() {
+        UUID questionId = randomUUID();
+        UUID answerId = randomUUID();
+
+        when(questionRepository.existsById(any(UUID.class))).thenReturn(false);
+
+        Exception e = assertThrows(QuestionNotFoundException.class, () -> answerService.deleteAnswer(questionId, answerId));
+        assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+    }
+
+    @Test
+    void shouldNotDeleteAnswerWhenAnswerIsNotFound() {
+        UUID questionId = randomUUID();
+        UUID answerId = randomUUID();
+
+        when(questionRepository.existsById(any(UUID.class))).thenReturn(true);
+        when(answerRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        Exception e = assertThrows(EntityNotFoundException.class, () -> answerService.deleteAnswer(questionId, answerId));
+        assertEquals(ENTITY_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
     }
 }

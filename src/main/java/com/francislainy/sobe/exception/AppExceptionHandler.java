@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final String QUESTION_NOT_FOUND_EXCEPTION = "NO QUESTION FOUND WITH THIS ID";
+    public static final String ENTITY_NOT_FOUND_EXCEPTION = "NO ENTITY FOUND WITH THIS ID";
     public static final String ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION = "User does not have permission to edit this entity";
 
     @ExceptionHandler(QuestionNotFoundException.class)
