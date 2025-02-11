@@ -22,7 +22,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
+import java.time.LocalDateTime;
+
+import static com.francislainy.sobe.exception.AppExceptionHandler.ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION;
 import static com.francislainy.sobe.util.TestUtil.fromJson;
 import static com.francislainy.sobe.util.TestUtil.toJson;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -31,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Testcontainers
@@ -52,7 +57,6 @@ public class AnswerControllerIT extends BasePostgresConfig {
     CurrentUserService currentUserService;
 
     UserEntity userEntity;
-
     QuestionEntity questionEntity;
 
     @BeforeEach
@@ -116,27 +120,23 @@ public class AnswerControllerIT extends BasePostgresConfig {
 
     @Test
     @WithMockUser
-    void shouldDeleteAnswer() throws Exception {
+    void shouldNotDeleteAnswerWhenNotTheAnswerCreator() throws Exception {
+        UserEntity anotherUserEntity = userRepository.save(User.builder()
+                .username("anotherUser")
+                .password("password")
+                .role("USER")
+                .build().toEntity());
+
         AnswerEntity answerEntity = answerRepository.save(AnswerEntity
                 .builder()
                 .content("This is an answer")
                 .questionEntity(questionEntity)
+                .userEntity(anotherUserEntity)
                 .build());
 
-        mockMvc.perform(delete("/api/v1/questions/{questionId}/answers/{answerId}", questionEntity.getId(), answerEntity.getId()))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void shouldNotDeleteAnswerWhenUserIsNotAuthenticated() throws Exception {
-        AnswerEntity answerEntity = answerRepository.save(AnswerEntity
-                .builder()
-                .content("This is an answer")
-                .questionEntity(questionEntity)
-                .userEntity(userEntity)
-                .build());
-
-        mockMvc.perform(delete("/api/v1/questions/{questionId}/answers/{answerId}", questionEntity.getId(), answerEntity.getId()))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/api/v1/questions/{questionId}/answers/{answerId}", questionEntity.getId(), answerEntity.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION));
     }
 }
