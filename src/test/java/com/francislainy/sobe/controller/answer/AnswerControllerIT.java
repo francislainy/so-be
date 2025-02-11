@@ -1,11 +1,13 @@
 package com.francislainy.sobe.controller.answer;
 
 import com.francislainy.sobe.config.BasePostgresConfig;
+import com.francislainy.sobe.entity.AnswerEntity;
 import com.francislainy.sobe.entity.QuestionEntity;
 import com.francislainy.sobe.entity.UserEntity;
 import com.francislainy.sobe.model.Answer;
 import com.francislainy.sobe.model.Question;
 import com.francislainy.sobe.model.User;
+import com.francislainy.sobe.repository.AnswerRepository;
 import com.francislainy.sobe.repository.QuestionRepository;
 import com.francislainy.sobe.repository.UserRepository;
 import com.francislainy.sobe.service.impl.CurrentUserService;
@@ -27,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,6 +45,8 @@ public class AnswerControllerIT extends BasePostgresConfig {
     UserRepository userRepository;
     @Autowired
     QuestionRepository questionRepository;
+    @Autowired
+    AnswerRepository answerRepository;
 
     @MockBean
     CurrentUserService currentUserService;
@@ -106,6 +111,32 @@ public class AnswerControllerIT extends BasePostgresConfig {
         mockMvc.perform(post("/api/v1/questions/{questionId}/answers", questionEntity.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(answer)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void shouldDeleteAnswer() throws Exception {
+        AnswerEntity answerEntity = answerRepository.save(AnswerEntity
+                .builder()
+                .content("This is an answer")
+                .questionEntity(questionEntity)
+                .build());
+
+        mockMvc.perform(delete("/api/v1/questions/{questionId}/answers/{answerId}", questionEntity.getId(), answerEntity.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldNotDeleteAnswerWhenUserIsNotAuthenticated() throws Exception {
+        AnswerEntity answerEntity = answerRepository.save(AnswerEntity
+                .builder()
+                .content("This is an answer")
+                .questionEntity(questionEntity)
+                .userEntity(userEntity)
+                .build());
+
+        mockMvc.perform(delete("/api/v1/questions/{questionId}/answers/{answerId}", questionEntity.getId(), answerEntity.getId()))
                 .andExpect(status().isUnauthorized());
     }
 }

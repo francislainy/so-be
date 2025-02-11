@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,5 +66,16 @@ public class AnswerControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(answerService, never()).createAnswer(any(), any());
+    }
+
+    @Test
+    void shouldDeleteAnswer() throws Exception {
+        UUID questionId = randomUUID();
+        UUID answerId = randomUUID();
+
+        mockMvc.perform(delete("/api/v1/questions/{questionId}/answers/{answerId}", questionId, answerId))
+                .andExpect(status().isNoContent());
+
+        verify(answerService, times(1)).deleteAnswer(any(), any());
     }
 }
