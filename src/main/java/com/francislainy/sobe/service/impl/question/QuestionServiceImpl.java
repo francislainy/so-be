@@ -56,10 +56,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void deleteQuestion(UUID questionID) {
+        UserEntity currentUser = currentUserService.getCurrentUser();
+
         QuestionEntity questionEntity = questionRepository.findById(questionID)
                 .orElseThrow(() -> new QuestionNotFoundException(QUESTION_NOT_FOUND_EXCEPTION));
-
-        UserEntity currentUser = currentUserService.getCurrentUser();
 
         // Check ownership
         if (!questionEntity.getUserEntity().getId().equals(currentUser.getId())) {

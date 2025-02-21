@@ -103,7 +103,7 @@ public class QuestionServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenQuestionNotFoundOnRetrival() {
+    void shouldThrowExceptionWhenQuestionNotFound() {
         UUID questionId = randomUUID();
         when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
 
@@ -238,7 +238,7 @@ public class QuestionServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenQuestionNotFoundOnDeletion() {
+    void shouldNotDeleteQuestionWhenQuestionNotFound() {
         UUID questionId = randomUUID();
         when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
 
