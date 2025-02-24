@@ -2,6 +2,7 @@ package com.francislainy.sobe.model;
 
 import com.francislainy.sobe.entity.QuestionEntity;
 import com.francislainy.sobe.entity.UserEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,11 +20,13 @@ import java.util.UUID;
 @With
 public class Question {
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private UUID id;
     @NotBlank
     private String title;
     @NotBlank
     private String content;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime createdAt;
 
     private UUID userId;

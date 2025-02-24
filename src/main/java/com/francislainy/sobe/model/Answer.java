@@ -20,6 +20,7 @@ import java.util.UUID;
 @With
 public class Answer {
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private UUID id;
 
     @NotBlank
