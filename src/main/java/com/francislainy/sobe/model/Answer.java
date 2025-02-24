@@ -3,6 +3,7 @@ package com.francislainy.sobe.model;
 import com.francislainy.sobe.entity.AnswerEntity;
 import com.francislainy.sobe.entity.QuestionEntity;
 import com.francislainy.sobe.entity.UserEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,9 @@ public class Answer {
     @NotBlank
     private String content;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private UUID questionId;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private UUID userId;
 
     // to entity

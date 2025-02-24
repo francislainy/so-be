@@ -45,18 +45,25 @@ public class QuestionServiceTest {
 
     @Test
     void shouldCreateQuestion() {
-        UUID userId = randomUUID();
+        UUID ownerId = randomUUID();
 
         Question question = Question.builder()
                 .title("question")
                 .content("content")
-                .userId(userId)
+                .userId(ownerId)
                 .createdAt(LocalDateTime.now())
                 .build();
 
         UUID questionId = randomUUID();
         QuestionEntity questionEntity = question.withId(questionId).toEntity();
 
+        UserEntity currentUser = UserEntity.builder()
+                .id(ownerId)
+                .username("testuser")
+                .password("password")
+                .build();
+
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
         when(questionRepository.save(any(QuestionEntity.class))).thenReturn(questionEntity);
 
         Question createdQuestion = questionService.createQuestion(question);
@@ -68,7 +75,7 @@ public class QuestionServiceTest {
                 () -> assertEquals(question.getTitle(), createdQuestion.getTitle(), "Question title should match"),
                 () -> assertEquals(question.getContent(), createdQuestion.getContent(), "Question content should match"),
                 () -> assertEquals(question.getCreatedAt(), createdQuestion.getCreatedAt(), "Question created at should match"),
-                () -> assertEquals(userId, createdQuestion.getUserId(), "Question user id should match"));
+                () -> assertEquals(ownerId, createdQuestion.getUserId(), "User id should match"));
 
         verify(questionRepository).save(any(QuestionEntity.class));
     }
@@ -103,7 +110,7 @@ public class QuestionServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenQuestionNotFoundOnRetrival() {
+    void shouldThrowExceptionWhenQuestionNotFoundOnRetrieval() {
         UUID questionId = randomUUID();
         when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
 

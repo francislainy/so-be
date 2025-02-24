@@ -26,7 +26,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Question createQuestion(Question question) {
-        QuestionEntity questionEntity = question.withCreatedAt(LocalDateTime.now()).toEntity();
+        UserEntity currentUser = currentUserService.getCurrentUser();
+
+        QuestionEntity questionEntity = question.withCreatedAt(LocalDateTime.now()).withUserId(currentUser.getId()).toEntity();
         return questionRepository.save(questionEntity).toModel();
     }
 
