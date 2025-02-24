@@ -1,6 +1,7 @@
 package com.francislainy.sobe.model;
 
 import com.francislainy.sobe.entity.UserEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ import static com.francislainy.sobe.enums.UserRole.USER;
 @With
 public class User {
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private UUID id;
     private String username;
     private String password;
