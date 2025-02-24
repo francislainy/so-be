@@ -33,8 +33,11 @@ public class AnswerServiceImpl implements AnswerService {
     public Answer createAnswer(UUID questionId, Answer answer) {
         QuestionEntity questionEntity = questionRepository.findById(questionId).orElseThrow(() -> new QuestionNotFoundException(QUESTION_NOT_FOUND_EXCEPTION));
 
+        UserEntity currentUser = currentUserService.getCurrentUser();
+
         AnswerEntity answerEntity = answer.toEntity();
-        answerEntity = answerEntity.withQuestionEntity(questionEntity);
+        answerEntity = answerEntity.withQuestionEntity(questionEntity).withUserEntity(currentUser);
+
         answerEntity = answerRepository.save(answerEntity);
 
         return answerEntity.toModel();

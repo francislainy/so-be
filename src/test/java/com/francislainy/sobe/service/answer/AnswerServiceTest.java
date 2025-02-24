@@ -51,8 +51,16 @@ public class AnswerServiceTest {
 
     @Test
     void shouldCreateAnswer() {
+        UUID ownerId = randomUUID();
+
         UUID questionId = randomUUID();
         UUID answerId = randomUUID();
+
+        UserEntity currentUser = UserEntity.builder()
+                .id(ownerId)
+                .username("testuser")
+                .password("password")
+                .build();
 
         QuestionEntity questionEntity = QuestionEntity.builder()
                 .id(questionId)
@@ -63,8 +71,9 @@ public class AnswerServiceTest {
                 .content("This is an answer")
                 .build();
 
-        AnswerEntity answerEntity = answer.withId(answerId).withQuestionId(questionId).toEntity();
+        AnswerEntity answerEntity = answer.withId(answerId).withQuestionId(questionId).withUserId(currentUser.getId()).toEntity();
 
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
         when(questionRepository.findById(any())).thenReturn(Optional.of(questionEntity));
         when(answerRepository.save(any())).thenReturn(answerEntity);
 
@@ -75,8 +84,10 @@ public class AnswerServiceTest {
         assertAll(
                 () -> assertNotNull(createdAnswer.getQuestionId(), "Question ID should not be null"),
                 () -> assertNotNull(createdAnswer.getId(), "Answer ID should not be null"),
-                () -> assertEquals(answer.getContent(), createdAnswer.getContent(), "Answer content should match")
-        );
+                () -> assertEquals(answer.getContent(), createdAnswer.getContent(), "Answer content should match"),
+                () -> assertEquals(ownerId, createdAnswer.getUserId(), "User id should match"));
+
+        verify(answerRepository, times(1)).save(any());
     }
 
     @Test
@@ -92,6 +103,8 @@ public class AnswerServiceTest {
 
         Exception e = assertThrows(QuestionNotFoundException.class, () -> answerService.createAnswer(questionId, answer));
         assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(answerRepository, never()).save(any());
     }
 
     @Test
@@ -123,6 +136,8 @@ public class AnswerServiceTest {
 
         Exception e = assertThrows(QuestionNotFoundException.class, () -> answerService.deleteAnswer(questionId, answerId));
         assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(answerRepository, never()).deleteById(answerId);
     }
 
     @Test
@@ -135,6 +150,8 @@ public class AnswerServiceTest {
 
         Exception e = assertThrows(EntityNotFoundException.class, () -> answerService.deleteAnswer(questionId, answerId));
         assertEquals(ENTITY_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(answerRepository, never()).deleteById(answerId);
     }
 
     @Test

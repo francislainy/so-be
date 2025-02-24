@@ -26,7 +26,9 @@ public class Answer {
     @NotBlank
     private String content;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private UUID questionId;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private UUID userId;
 
     // to entity
