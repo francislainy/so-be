@@ -25,6 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.francislainy.sobe.exception.AppExceptionHandler.ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION;
 import static com.francislainy.sobe.util.TestUtil.fromJson;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -115,6 +117,50 @@ public class AnswerControllerIT extends BasePostgresConfig {
         mockMvc.perform(post("/api/v1/questions/{questionId}/answers", questionEntity.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(answer)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void shouldGetListOfAnswers() throws Exception {
+        AnswerEntity answerEntity1 = answerRepository.save(AnswerEntity
+                .builder()
+                .content("This is an answer")
+                .questionEntity(questionEntity)
+                .userEntity(userEntity)
+                .build());
+
+        AnswerEntity answerEntity2 = answerRepository.save(AnswerEntity
+                .builder()
+                .content("This is another answer")
+                .questionEntity(questionEntity)
+                .userEntity(userEntity)
+                .build());
+
+        List<Answer> answers = List.of(
+                answerEntity1.toModel(),
+                answerEntity2.toModel()
+        );
+
+        MvcResult result = mockMvc.perform(get("/api/v1/questions/{questionId}/answers", questionEntity.getId()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Answer[] createdAnswersArray = (Answer[]) fromJson(result.getResponse().getContentAsString(), Answer[].class);
+        List<Answer> createdAnswers = List.of(createdAnswersArray);
+        assertAll(
+                () -> assertNotNull(createdAnswers, "Answers should not be null"),
+                () -> assertEquals(2, createdAnswers.size(), "Answers list should have 2 answers"),
+                () -> assertEquals(answers.get(0).getId(), createdAnswers.get(0).getId(), "Answer ID should match"),
+                () -> assertEquals(answers.get(0).getContent(), createdAnswers.get(0).getContent(), "Answer content should match"),
+                () -> assertEquals(answers.get(1).getId(), createdAnswers.get(1).getId(), "Answer ID should match"),
+                () -> assertEquals(answers.get(1).getContent(), createdAnswers.get(1).getContent(), "Answer content should match")
+        );
+    }
+
+    @Test
+    void shouldNotGetListOfAnswersWhenUserIsNotAuthenticated() throws Exception {
+        mockMvc.perform(get("/api/v1/questions/{questionId}/answers", questionEntity.getId()))
                 .andExpect(status().isUnauthorized());
     }
 

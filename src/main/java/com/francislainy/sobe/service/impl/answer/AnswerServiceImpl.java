@@ -14,6 +14,7 @@ import com.francislainy.sobe.service.impl.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.francislainy.sobe.exception.AppExceptionHandler.ENTITY_DOES_NOT_BELONG_TO_USER_EXCEPTION;
@@ -41,6 +42,21 @@ public class AnswerServiceImpl implements AnswerService {
         answerEntity = answerRepository.save(answerEntity);
 
         return answerEntity.toModel();
+    }
+
+    @Override
+    public List<Answer> getAnswers(UUID questionId) {
+        if (!questionRepository.existsById(questionId)) {
+            throw new QuestionNotFoundException(QUESTION_NOT_FOUND_EXCEPTION);
+        }
+
+        List<AnswerEntity> answerEntities = answerRepository.findAllByQuestionEntity_Id(questionId);
+
+        if (answerEntities != null) {
+            return answerEntities.stream().map(AnswerEntity::toModel).toList();
+        }
+
+        return List.of();
     }
 
     @Override
