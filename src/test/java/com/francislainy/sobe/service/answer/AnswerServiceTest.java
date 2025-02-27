@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -105,6 +106,55 @@ public class AnswerServiceTest {
         assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
 
         verify(answerRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldGetListOfAnswers() {
+        UUID questionId = randomUUID();
+
+        AnswerEntity answerEntity1 = Answer.builder()
+                .id(randomUUID())
+                .content("This is an answer")
+                .build()
+                .toEntity();
+
+        AnswerEntity answerEntity2 = Answer.builder()
+                .id(randomUUID())
+                .content("This is an answer")
+                .build()
+                .toEntity();
+
+        when(questionRepository.existsById(any(UUID.class))).thenReturn(true);
+        when(answerRepository.findAllByQuestionEntity_Id(any(UUID.class))).thenReturn(List.of(answerEntity1, answerEntity2));
+
+        List<Answer> answers = answerService.getAnswers(questionId);
+
+        assertAll(
+                () -> assertNotNull(answers, "Answers should not be null"),
+                () -> assertEquals(2, answers.size(), "Answers list should be empty"),
+
+                () -> assertEquals(answerEntity1.getId(), answers.get(0).getId(), "Answer ID should match"),
+                () -> assertEquals(answerEntity1.getContent(), answers.get(0).getContent(), "Answer content should match"),
+                () -> assertEquals(answerEntity1.getUserEntity().getId(), answers.get(0).getUserId(), "User ID should match"),
+
+                () -> assertEquals(answerEntity2.getId(), answers.get(1).getId(), "Answer ID should match"),
+                () -> assertEquals(answerEntity2.getContent(), answers.get(1).getContent(), "Answer content should match"),
+                () -> assertEquals(answerEntity2.getUserEntity().getId(), answers.get(1).getUserId(), "User ID should match")
+                );
+
+        verify(answerRepository, times(1)).findAllByQuestionEntity_Id(questionId);
+    }
+
+    @Test
+    void shouldNotGetListOfAnswersWhenQuestionIsNotFound() {
+        UUID questionId = randomUUID();
+
+        when(questionRepository.existsById(any(UUID.class))).thenReturn(false);
+
+        Exception e = assertThrows(QuestionNotFoundException.class, () -> answerService.getAnswers(questionId));
+        assertEquals(QUESTION_NOT_FOUND_EXCEPTION, e.getMessage(), "Exception message should match");
+
+        verify(answerRepository, never()).findAllByQuestionEntity_Id(questionId);
     }
 
     @Test

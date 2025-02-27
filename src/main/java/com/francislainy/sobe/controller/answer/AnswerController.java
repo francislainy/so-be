@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +29,17 @@ public class AnswerController {
     @PostMapping
     public ResponseEntity<Answer> createAnswer(@PathVariable UUID questionId, @Valid @RequestBody Answer answer) {
         return new ResponseEntity<>(answerService.createAnswer(questionId, answer), HttpStatus.CREATED);
+    }
+
+
+    @Operation(summary = "Get all answers for a question")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Answers retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Question not found")
+    })
+    @GetMapping
+    public ResponseEntity<List<Answer>> getAnswers(@PathVariable UUID questionId) {
+        return new ResponseEntity<>(answerService.getAnswers(questionId), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete an answer by ID")
